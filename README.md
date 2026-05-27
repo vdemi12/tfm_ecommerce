@@ -1,4 +1,4 @@
-# TFM — Plataforma E-Commerce IA
+# TFM - Plataforma E-Commerce
 **DigitechFP · Especialización en IA y Big Data · 2025-2026**
 
 ## Antes de hacer `docker compose up`
@@ -9,13 +9,12 @@ Descarga desde Kaggle y copia aquí:
 
 | Archivo | Dataset Kaggle |
 |---|---|
-| `Reviews.csv` | [Amazon Fine Food Reviews](https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews) |
-| `train_transaction.csv` | [IEEE-CIS Fraud Detection](https://www.kaggle.com/c/ieee-fraud-detection/data) |
-| `train_identity.csv` | [IEEE-CIS Fraud Detection](https://www.kaggle.com/c/ieee-fraud-detection/data) |
+| `Reviews.csv` | [Amazon Product Reviews](https://www.kaggle.com/datasets/arhamrumi/amazon-product-reviews) |
+| `train_transaction.csv` | [IEEE-CIS Fraud Detection](https://www.kaggle.com/competitions/ieee-fraud-detection) |
+| `train_identity.csv` | [IEEE-CIS Fraud Detection](https://www.kaggle.com/competitions/ieee-fraud-detection) |
 
-> El File Manager (puerto 3055) también permite subirlos desde el navegador una vez el entorno esté arriba.
 
-### 2. Arranca el entorno
+### 2. Arranca el entorno para notebook 1 y 2
 
 ```bash
 docker compose up -d
@@ -23,11 +22,6 @@ docker compose up -d
 
 La primera vez tarda unos minutos (descarga imágenes + instala librerías extra en Jupyter).
 
-Comprueba que todo está listo:
-```bash
-docker compose logs -f jupyter
-# Espera hasta ver: "Jupyter Server ... is running at:"
-```
 
 ### 3. Accede a Jupyter Lab
 
@@ -45,16 +39,19 @@ tfm_ecommerce/
 ├── requirements.txt            ← dependencias Python
 ├── info.txt                    ← URLs y credenciales de acceso
 ├── README.md                   ← este archivo
-├── models/
-│   ├── models-fraud/           ← lstm_fraud_model.keras + fraud_scaler.joblib
-│   ├── models-recommendation/  ← item_similarity_matrix.joblib + kmeans_rfm_model.joblib
-│   └── models-sentiment/       ← sentiment_pipeline.pkl
-├── reports/
-│   ├── reports-dashboard/      ← gráficos consolidados + dashboard_ejecutivo.txt
-│   ├── reports-fraud/          ← desbalanceo_clases.png + matriz de confusión
-│   ├── reports-recommendation/ ← distribucion_ratings.png + metodo_codo_rfm.png
-│   └── reports-sentiment/      ← evaluation_sentiment.png + top_ngrams_sentiment.png
+├── RapidMiner/
+│   ├── fraud.rmp/              
+│   ├── ratings.rmp/         
 └── volumes/
+    ├── models/
+    │   ├── models-fraud/               ← lstm_fraud_model.keras + fraud_scaler.joblib
+    │   ├── models-recommendation/      ← item_similarity_matrix.joblib + kmeans_rfm_model.joblib
+    │   └── models-sentiment/           ← sentiment_pipeline.pkl
+    ├── reports/
+    │   ├── reports-dashboard/          ← gráficos consolidados + dashboard_ejecutivo.txt
+    │   ├── reports-fraud/              ← desbalanceo_clases.png + matriz de confusión
+    │   ├── reports-recommendation/     ← distribucion_ratings.png + metodo_codo_rfm.png
+    │   └── reports-sentiment/          ← evaluation_sentiment.png + top_ngrams_sentiment.png
     ├── hdfs/                   ← datos compartidos entre contenedores
     │   └── data/
     │       ├── raw/            ← ⬅ PON AQUÍ LOS DATASETS DE KAGGLE
@@ -151,25 +148,6 @@ Cuadro de mando ejecutivo que consolida todas las métricas del proyecto. Genera
 | Detección de Fraude | F1-Score | ≥ 0.88 | **0.9540** ✅ |
 | Detección de Fraude | Recall | ≥ 0.85 | **0.9240** ✅ |
 | Análisis de Sentimiento | Accuracy | ≥ 0.85 | **0.9519** ✅ |
-
----
-
-## Conexión a Spark desde cualquier notebook
-
-```python
-from pyspark.sql import SparkSession
-
-spark = SparkSession.builder \
-    .appName("TFM_Ecommerce") \
-    .master("spark://spark-master:7077") \
-    .config("spark.executor.memory", "1g") \
-    .getOrCreate()
-
-spark.range(5).show()
-```
-
-Los datos se leen desde `/opt/spark-data/data/raw/` dentro del contenedor,
-que corresponde a `./volumes/hdfs/data/raw/` en tu máquina.
 
 ---
 
