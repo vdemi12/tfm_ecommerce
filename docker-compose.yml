@@ -1,0 +1,135 @@
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      '
+      mkdir -p /database /config;
+      filebrowser config init -a 0.0.0.0 -p 80 -r /srv -d /database/filebrowser.db || true;
+      filebrowser users add admin bigdataspark --perm.admin -d /database/filebrowser.db || true;
+      exec filebrowser -r /srv -d /database/filebrowser.db -a 0.0.0.0 -p 80
+      '
+    ports:
+      - "3055:80"
+    volumes:
+      - ./volumes/hdfs:/srv
+      - filebrowser_database:/database
+      - filebrowser_config:/config
+    restart: unless-stopped
+    networks:
+      - bigdata-net
+
+  spark-master:
+    image: apache/spark:3.5.0-python3
+    container_name: spark-master
+    hostname: spark-master
+    user: "0:0"
+    command:
+      [
+        "/opt/spark/bin/spark-class",
+        "org.apache.spark.deploy.master.Master",
+        "--host", "spark-master",
+        "--port", "7077",
+        "--webui-port", "8080"
+      ]
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    volumes:
+      - ./volumes/hdfs:/opt/spark-data
+    restart: unless-stopped
+    networks:
+      - bigdata-net
+
+  spark-worker-1:
+    image: apache/spark:3.5.0-python3
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    user: "0:0"
+    depends_on:
+      - spark-master
+    command:
+      [
+        "/opt/spark/bin/spark-class",
+        "org.apache.spark.deploy.worker.Worker",
+        "spark://spark-master:7077",
+        "--webui-port", "8081",
+        "--cores", "2",
+        "--memory", "2G"
+      ]
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./volumes/hdfs:/opt/spark-data
+    restart: unless-stopped
+    networks:
+      - bigdata-net
+
+  spark-worker-2:
+    image: apache/spark:3.5.0-python3
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    user: "0:0"
+    depends_on:
+      - spark-master
+    command:
+      [
+        "/opt/spark/bin/spark-class",
+        "org.apache.spark.deploy.worker.Worker",
+        "spark://spark-master:7077",
+        "--webui-port", "8081",
+        "--cores", "2",
+        "--memory", "2G"
+      ]
+    ports:
+      - "8082:8081"
+    volumes:
+      - ./volumes/hdfs:/opt/spark-data
+    restart: unless-stopped
+    networks:
+      - bigdata-net
+
+  jupyter:
+    image: quay.io/jupyter/pyspark-notebook:spark-3.5.0
+    container_name: compute-bigdata
+    hostname: compute-bigdata
+    user: root
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      CHOWN_HOME: "yes"
+      CHOWN_HOME_OPTS: "-R"
+      GRANT_SUDO: "yes"
+      SPARK_MASTER: spark://spark-master:7077
+      # Librerías extra necesarias para el TFM instaladas al arrancar
+      DOCKER_STACKS_JUPYTER_CMD: lab
+    command: >
+      bash -c "
+        pip install --quiet imbalanced-learn mlflow scikit-learn wordcloud &&
+        start-notebook.py --IdentityProvider.token='sparklab' --ServerApp.password=''
+      "
+    ports:
+      - "3011:8888"
+      - "4040:4040"
+      - "4041:4041"
+      - "4042:4042"
+    volumes:
+      - ./volumes/hdfs:/opt/spark-data
+      - ./volumes/hdfs:/home/jovyan/hdfs
+      - ./volumes/compute-bigdata:/home/jovyan/work
+    restart: unless-stopped
+    networks:
+      - bigdata-net
+
+volumes:
+  filebrowser_database:
+  filebrowser_config:
+
+networks:
+  bigdata-net:
+    driver: bridge

@@ -1,0 +1,28 @@
+FILE MANAGER
+http://127.0.0.1:3055
+- usuario: admin
+- contraseña: bigdataspark
+
+JUPYTER
+http://127.0.0.1:3011
+- token: sparklab
+
+SPARK MASTER UI
+http://127.0.0.1:8080
+SPARK WORKERS UI
+http://127.0.0.1:8081
+http://127.0.0.1:8082
+
+SPARK APPLICATION UI:
+http://localhost:4040
+http://localhost:4041
+http://localhost:4042
+
+
+========================================
+  ARRANCAR / PARAR EL ENTORNO
+========================================
+
+  Arrancar:   docker compose up -d
+  Ver logs:   docker compose logs -f jupyter
+  Parar:      docker compose down

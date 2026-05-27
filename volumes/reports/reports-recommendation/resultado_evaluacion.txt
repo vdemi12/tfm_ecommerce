@@ -1,0 +1,8 @@
+============================================================
+      AUDITORÍA DE MÉTRICAS - MOTOR DE RECOMENDACIÓN        
+============================================================
+Métrica evaluada: Precision@10
+Valor alcanzado:  0.7432
+Objetivo mínimo:  0.7000
+Resultado meta:   CUMPLIDO
+============================================================

@@ -1,0 +1,10 @@
+============================================================
+INFORME FINAL DEL PROYECTO
+============================================================
+1. Motor Recomendacion (Precision@10): 0.7432 [META: >=0.70]
+2. Modulo Fraude LSTM (F1-Score):     0.9540 [META: >=0.88]
+3. Modulo Fraude LSTM (Recall):       0.9240 [META: >=0.85]
+4. Analisis Sentimiento (Accuracy):   0.9519 [META: >=0.85]
+------------------------------------------------------------
+TODOS LOS REQUISITOS HAN SIDO CUMPLIDOS.
+============================================================
