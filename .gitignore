@@ -2,18 +2,8 @@
 volumes/hdfs/data/raw/*.csv
 volumes/hdfs/data/raw/*.xlsx
 volumes/hdfs/data/clean/*.csv
-volumes/hdfs/data/features/*.csv
-volumes/hdfs/data/features/*.npy
 
-# Modelos entrenados pesados
-models/*.keras
-models/*.h5
-models/*.pkl
-
-# MLflow
-mlruns/
-
-# Filebrowser (generado automáticamente por Docker)
+# Filebrowser
 volumes/hdfs/.filebrowser.db
 
 # Python
