@@ -39,6 +39,7 @@ tfm_ecommerce/
 ├── requirements.txt            ← dependencias Python
 ├── info.txt                    ← URLs y credenciales de acceso
 ├── README.md                   ← este archivo
+├── TFM_ecommerce.docx          ← documentacion del proyecto
 ├── RapidMiner/
 │   ├── fraud.rmp/              
 │   ├── ratings.rmp/         
